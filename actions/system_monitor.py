@@ -5,6 +5,9 @@ Zero subprocess calls on all platforms — uses ctypes/pynvml/psutil/wmi only.
 import ctypes
 import platform
 import time
+import warnings
+
+warnings.filterwarnings("ignore", category=FutureWarning, module="pynvml")
 
 import psutil
 
@@ -72,10 +75,12 @@ def _nvml_gpu() -> float:
 def _get_gpu_usage() -> float:
     # pynvml — subprocess-free, works everywhere if installed
     try:
-        import pynvml  # type: ignore
-        pynvml.nvmlInit()
-        h = pynvml.nvmlDeviceGetHandleByIndex(0)
-        return float(pynvml.nvmlDeviceGetUtilizationRates(h).gpu)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=FutureWarning)
+            import pynvml  # type: ignore
+            pynvml.nvmlInit()
+            h = pynvml.nvmlDeviceGetHandleByIndex(0)
+            return float(pynvml.nvmlDeviceGetUtilizationRates(h).gpu)
     except Exception:
         pass
 
