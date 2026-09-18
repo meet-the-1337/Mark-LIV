@@ -78,6 +78,9 @@ class PluginRegistry:
     def has(self, name: str) -> bool:
         return name in self._plugins
 
+    def names(self) -> set[str]:
+        return set(self._plugins.keys())
+
     def scheduling(self, name: str) -> Optional[str]:
         """How this plugin's result should re-enter the conversation, if it said."""
         rec = self._plugins.get(name)

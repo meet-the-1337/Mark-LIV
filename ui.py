@@ -9,8 +9,10 @@ import subprocess
 import sys
 import threading
 import time
+import warnings
 from pathlib import Path
 
+warnings.filterwarnings("ignore", category=FutureWarning, module="pynvml")
 import psutil
 
 if platform.system() == "Windows":
@@ -298,11 +300,13 @@ class _SysMetrics:
         if self._pynvml_ok is not False:
             try:
                 if self._pynvml_h is None:
-                    import pynvml  # type: ignore
-                    pynvml.nvmlInit()
-                    self._pynvml    = pynvml
-                    self._pynvml_h  = pynvml.nvmlDeviceGetHandleByIndex(0)
-                    self._pynvml_ok = True
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore", category=FutureWarning)
+                        import pynvml  # type: ignore
+                        pynvml.nvmlInit()
+                        self._pynvml    = pynvml
+                        self._pynvml_h  = pynvml.nvmlDeviceGetHandleByIndex(0)
+                        self._pynvml_ok = True
                 return float(self._pynvml.nvmlDeviceGetUtilizationRates(self._pynvml_h).gpu)
             except Exception:
                 self._pynvml_ok = False
@@ -5335,8 +5339,8 @@ class JarvisUI:
     def glance(self, dx: float, dy: float, hold: float = 1.1) -> None:
         """Ask the avatar to look somewhere for a moment (see HoloAvatar.glance)."""
         try:
-            if self._avatar is not None:
-                self._avatar.glance(dx, dy, hold)
+            if hasattr(self._win, "hud") and self._win.hud is not None:
+                self._win.hud.glance(dx, dy, hold)
         except Exception:
             pass
 

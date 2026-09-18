@@ -163,7 +163,13 @@ def discover_actions(actions_dir: Path, reserved_names: set[str] | None = None,
     Import/validation errors and name collisions are logged and the file is
     skipped — they NEVER raise out of this function.
     """
-    reserved = reserved_names or set()
+    if callable(reserved_names):
+        logger = reserved_names
+        reserved = set()
+    elif reserved_names is None:
+        reserved = set()
+    else:
+        reserved = set(reserved_names)
     actions_dir.mkdir(parents=True, exist_ok=True)
     valid: dict[str, ActionRecord] = {}
     all_records: list[ActionRecord] = []
