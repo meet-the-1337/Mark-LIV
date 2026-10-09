@@ -353,16 +353,16 @@ class TestMemoryManager:
             orig_path = mm.MEMORY_PATH
             try:
                 mm.MEMORY_PATH = test_file
-                mm.remember("user_name", "Manan", category="identity")
+                mm.remember("user_name", "1337", category="identity")
                 mm.remember("preferred_os", "CachyOS", category="preferences")
                 mm.remember("project", "Autonomous JARVIS", category="projects")
 
                 mem = mm.load_memory()
-                assert mem["identity"]["user_name"]["value"] == "Manan"
+                assert mem["identity"]["user_name"]["value"] == "1337"
                 assert mem["preferences"]["preferred_os"]["value"] == "CachyOS"
 
                 context = mm.format_memory_for_prompt(mem)
-                assert "Manan" in context
+                assert "1337" in context
                 assert "CachyOS" in context
                 assert len(context) <= mm.PROMPT_CORE_CHARS + 500
             finally:
